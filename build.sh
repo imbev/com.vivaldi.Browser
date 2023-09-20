@@ -4,13 +4,14 @@
 flatpak-builder \
 	--force-clean \
 	.build-dir \
-	com.vivaldi.Browser.yaml
+	--disable-rofiles-fuse \
+	com.vivaldi.Browser.yaml && \
 
 flatpak build-export \
 	repo \
-	.build-dir
+	.build-dir && \
 
 flatpak build-bundle \
 	repo \
 	vivaldi.flatpak \
-	com.vivaldi.Browser
+	com.vivaldi.Browser 

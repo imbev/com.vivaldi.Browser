@@ -57,16 +57,56 @@ modules:
       - ar -xv vivaldi.deb
       - tar -xvf data.tar.xz
       - mv opt/vivaldi /app/
+
+      - install -Dm 755 vivaldi.sh /app/bin/vivaldi
+      - install -Dm 644 -t /app/etc cobalt.ini
+      - install -Dm 644 vivaldi-browser.desktop /app/share/applications/com.vivaldi.Browser.desktop
+      - install -Dm 644 vivaldi-icon.svg /app/share/icons/hicolor/scalable/apps/com.vivaldi.Browser.svg
     sources:
       - type: file
-        #url: http://web.archive.org/web/20230919214105/https://downloads.vivaldi.com/stable/vivaldi-stable-6.2.3105.47-1.x86_64.rpm
         url: https://downloads.vivaldi.com/stable/vivaldi-stable_6.2.3105.47-1_amd64.deb
         sha256: 921b6257cc7f11cd9105005135d7d65f0a907b361a2ca0671aa6e93961053c3d
         dest-filename: vivaldi.deb
-  - name: vivaldi.sh
-    buildsystem: simple
-    build-commands:
-      - install -D vivaldi.sh /app/bin/vivaldi
-    sources:
       - type: file
         path: vivaldi.sh
+      - type: file
+        path: cobalt.ini
+      - type: file
+        path: vivaldi-browser.desktop
+      - type: file
+        path: vivaldi-icon.svg
+  
+  - name: dconf
+    buildsystem: meson
+    config-opts:
+      - -Dbash_completion=false
+      - -Dman=false
+      - -Dvapi=false
+    cleanup:
+      - /etc
+      - /include
+      - ca.desrt.dconf.service
+      - dconf.service
+      - dconf-service
+      - '*.pc'
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/dconf/0.40/dconf-0.40.0.tar.xz
+        sha256: cf7f22a4c9200421d8d3325c5c1b8b93a36843650c9f95d6451e20f0bcb24533
+        x-checker-data:
+          type: gnome
+          name: dconf
+          stable-only: true
+      # From: https://src.fedoraproject.org/rpms/dconf
+      - type: patch
+        path: dconf-override.patch
+
+  - name: zypak
+    sources:
+      - type: git
+        url: https://github.com/refi64/zypak
+        tag: v2022.04
+        commit: 55a60d110301e8dd37b631503c3524ab7baaf7aa
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$

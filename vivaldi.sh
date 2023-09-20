@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
 cd /app/vivaldi
-./vivaldi
+
+exec cobalt "$@" --no-default-browser-check
